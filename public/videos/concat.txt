@@ -1,0 +1,4 @@
+file 'video-01-hero-floating.mp4'
+file 'video-02-burger-exploded.mp4'
+file 'video-06-burger-reassemble.mp4'
+file 'video-07-packaging-box-reveal.mp4'

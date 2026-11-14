@@ -1,26 +1,106 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #080706;
+  --bg-secondary: #110f0d;
+  --bg-card: rgba(22, 19, 17, 0.75);
+  --gold: #e5a93c;
+  --gold-bright: #f5c46b;
+  --gold-glow: rgba(229, 169, 60, 0.25);
+  --ember: #ff5722;
+  --ember-glow: rgba(255, 87, 34, 0.25);
+  --text: #f5f2ec;
+  --text-muted: rgba(245, 242, 236, 0.6);
+  --border-gold: rgba(229, 169, 60, 0.15);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+* {
+  box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background-color: var(--bg);
+  color: var(--text);
+  scroll-behavior: auto !important; /* Lenis handles smooth scrolling */
+  overflow-x: hidden;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Lenis smooth scroll recommended CSS */
+html.lenis, html.lenis body {
+  height: auto;
+}
+
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+.lenis.lenis-scrolling iframe {
+  pointer-events: none;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #080706;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(229, 169, 60, 0.25);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(229, 169, 60, 0.5);
+}
+
+/* Radial blend utility from scroll-site-generator skill */
+.img-blend {
+  -webkit-mask-image: radial-gradient(ellipse 85% 85% at 50% 50%, black 50%, transparent 100%);
+  mask-image: radial-gradient(ellipse 85% 85% at 50% 50%, black 50%, transparent 100%);
+}
+
+.vignette-radial {
+  background: radial-gradient(circle at 50% 50%, transparent 40%, #080706 95%);
+}
+
+/* Glassmorphism card styles */
+.glass-panel {
+  background: rgba(18, 15, 13, 0.72);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(229, 169, 60, 0.12);
+}
+
+.glass-panel-glow {
+  background: rgba(22, 19, 17, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(229, 169, 60, 0.25);
+  box-shadow: 0 0 35px rgba(229, 169, 60, 0.08);
+}
+
+/* Cinematic text glow */
+.text-gold-glow {
+  text-shadow: 0 0 20px rgba(229, 169, 60, 0.4);
+}
+
+.text-ember-glow {
+  text-shadow: 0 0 20px rgba(255, 87, 34, 0.4);
 }
