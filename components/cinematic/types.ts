@@ -189,3 +189,4 @@ export const CINEMATIC_SCENES: CinematicSceneData[] = [
     ambientColor: "#e5a93c",
   },
 ];
+

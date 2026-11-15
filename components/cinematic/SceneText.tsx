@@ -129,3 +129,4 @@ export default function SceneText({ scene, progress, isActive }: SceneTextProps)
     </div>
   );
 }
+
