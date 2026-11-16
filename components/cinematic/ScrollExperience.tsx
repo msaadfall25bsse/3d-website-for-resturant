@@ -46,7 +46,7 @@ export default function ScrollExperience() {
     };
   }, []);
 
-  // Smooth programmatic scroll to a specific scene
+  // Smooth programmatic scroll to a specific scene with Lenis support
   const scrollToScene = useCallback((index: number) => {
     const track = trackRef.current;
     if (!track) return;
@@ -55,12 +55,17 @@ export default function ScrollExperience() {
     const scrollTop = window.scrollY + rect.top;
     const scrollDistance = track.offsetHeight - window.innerHeight;
     const targetScroll =
-      scrollTop + (index / CINEMATIC_SCENES.length) * scrollDistance + 15;
+      scrollTop + (index / CINEMATIC_SCENES.length) * scrollDistance + 10;
 
-    window.scrollTo({
-      top: targetScroll,
-      behavior: "smooth",
-    });
+    const winWithLenis = window as unknown as { lenis?: { scrollTo: (target: number) => void } };
+    if (winWithLenis.lenis && typeof winWithLenis.lenis.scrollTo === "function") {
+      winWithLenis.lenis.scrollTo(targetScroll);
+    } else {
+      window.scrollTo({
+        top: targetScroll,
+        behavior: "smooth",
+      });
+    }
   }, []);
 
   const handlePrevScene = useCallback(() => {
@@ -82,7 +87,6 @@ export default function ScrollExperience() {
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      // Only react if active inside the track
       if (!trackRef.current) return;
       const rect = trackRef.current.getBoundingClientRect();
       const isInView = rect.top <= 100 && rect.bottom >= window.innerHeight;
@@ -106,8 +110,8 @@ export default function ScrollExperience() {
       ref={trackRef}
       className="relative w-full bg-[#080706]"
       style={{
-        // 150vh per scene across 8 scenes = 1200vh total scroll distance
-        height: `${CINEMATIC_SCENES.length * 150}vh`,
+        // 140vh per scene across 8 scenes = 1120vh total scroll distance
+        height: `${CINEMATIC_SCENES.length * 140}vh`,
       }}
     >
       {/* ── INTELLIGENT RESOURCE PRELOADER ── */}
@@ -146,4 +150,3 @@ export default function ScrollExperience() {
     </div>
   );
 }
-

@@ -9,17 +9,21 @@ gsap.registerPlugin(ScrollTrigger);
 
 /**
  * Lenis smooth scroll wired into GSAP's ticker so ScrollTrigger and Lenis
- * share one clock — the standard recipe for buttery scrub animations
- * from the scroll-site-generator skill.
+ * share one clock — the standard recipe for buttery scrub animations.
  */
 export default function SmoothScroll({ children }: { children: ReactNode }) {
   useEffect(() => {
     const lenis = new Lenis({
-      lerp: 0.09,
+      lerp: 0.08,
       duration: 1.2,
       smoothWheel: true,
-      touchMultiplier: 1.6,
+      touchMultiplier: 1.5,
     });
+
+    // Expose on window for smooth programmatic navigation
+    if (typeof window !== "undefined") {
+      (window as unknown as { lenis?: Lenis }).lenis = lenis;
+    }
 
     lenis.on("scroll", ScrollTrigger.update);
     const raf = (time: number) => lenis.raf(time * 1000);
@@ -29,6 +33,9 @@ export default function SmoothScroll({ children }: { children: ReactNode }) {
     return () => {
       gsap.ticker.remove(raf);
       lenis.destroy();
+      if (typeof window !== "undefined") {
+        delete (window as unknown as { lenis?: Lenis }).lenis;
+      }
     };
   }, []);
 

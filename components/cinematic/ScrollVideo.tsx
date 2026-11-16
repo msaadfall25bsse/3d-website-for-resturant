@@ -26,44 +26,81 @@ export default function ScrollVideo({
   onDurationLoaded,
 }: ScrollVideoProps) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [isVideoReady, setIsVideoReady] = useState(false);
   const [hasError, setHasError] = useState(false);
-  const [duration, setDuration] = useState<number>(0);
+  const durationRef = useRef<number>(10); // default to 10s if not loaded yet
   const rAFRef = useRef<number | null>(null);
-  const lastTargetTime = useRef<number>(0);
+  const isSeekingRef = useRef<boolean>(false);
 
-  // Synchronize video.currentTime via requestAnimationFrame
-  const syncPlayhead = useCallback(
-    (targetProgress: number) => {
-      const vid = videoRef.current;
-      if (!vid || hasError) return;
+  // Directly load and read metadata
+  useEffect(() => {
+    const vid = videoRef.current;
+    if (!vid) return;
 
-      const dur = duration || vid.duration;
-      if (!dur || isNaN(dur) || dur <= 0) return;
-
-      // Map progress [0, 1] to target time in video, clamping to valid range
-      const targetTime = Math.min(
-        Math.max(targetProgress * dur, 0),
-        Math.max(dur - 0.05, 0)
-      );
-
-      // Throttling: only update if delta is meaningful (> 0.03s) to prevent decoder lag
-      if (Math.abs(vid.currentTime - targetTime) > 0.03) {
-        lastTargetTime.current = targetTime;
-        if ("fastSeek" in vid && typeof (vid as unknown as { fastSeek: (t: number) => void }).fastSeek === "function") {
-          try {
-            (vid as unknown as { fastSeek: (t: number) => void }).fastSeek(targetTime);
-          } catch {
-            vid.currentTime = targetTime;
-          }
-        } else {
-          vid.currentTime = targetTime;
-        }
+    const onMeta = () => {
+      if (vid.duration && !isNaN(vid.duration) && vid.duration > 0) {
+        durationRef.current = vid.duration;
+        setIsVideoReady(true);
+        if (onDurationLoaded) onDurationLoaded(vid.duration);
       }
-    },
-    [duration, hasError]
-  );
+    };
 
-  // Sync on progress change when active
+    const onCanPlay = () => {
+      setIsVideoReady(true);
+    };
+
+    const onError = () => {
+      // If primary src fails, try fallback
+      if (fallbackSrc && vid.src !== fallbackSrc) {
+        vid.src = fallbackSrc;
+        vid.load();
+      } else {
+        setHasError(true);
+      }
+    };
+
+    vid.addEventListener("loadedmetadata", onMeta);
+    vid.addEventListener("canplay", onCanPlay);
+    vid.addEventListener("error", onError);
+
+    // If already has metadata
+    if (vid.readyState >= 1 && vid.duration) {
+      onMeta();
+    }
+
+    return () => {
+      vid.removeEventListener("loadedmetadata", onMeta);
+      vid.removeEventListener("canplay", onCanPlay);
+      vid.removeEventListener("error", onError);
+    };
+  }, [videoSrc, fallbackSrc, onDurationLoaded]);
+
+  // Synchronize playhead accurately with scroll progress
+  const syncPlayhead = useCallback((targetProgress: number) => {
+    const vid = videoRef.current;
+    if (!vid) return;
+
+    const dur = durationRef.current || vid.duration || 10;
+    const targetTime = Math.min(
+      Math.max(targetProgress * dur, 0),
+      Math.max(dur - 0.05, 0)
+    );
+
+    // Delta threshold: only seek if difference is meaningful to prevent decoder lock
+    const diff = Math.abs(vid.currentTime - targetTime);
+    if (diff > 0.02 && !isSeekingRef.current) {
+      isSeekingRef.current = true;
+      vid.currentTime = targetTime;
+      // Release seek lock on seeked
+      const onSeeked = () => {
+        isSeekingRef.current = false;
+        vid.removeEventListener("seeked", onSeeked);
+      };
+      vid.addEventListener("seeked", onSeeked, { once: true });
+    }
+  }, []);
+
+  // Update on progress changes
   useEffect(() => {
     if (!isActive && !isUpcoming) return;
 
@@ -80,7 +117,7 @@ export default function ScrollVideo({
     };
   }, [progress, isActive, isUpcoming, syncPlayhead]);
 
-  // Keep video paused while scrubbing
+  // Ensure video stays paused for frame-accurate scrubbing
   useEffect(() => {
     const vid = videoRef.current;
     if (vid) {
@@ -88,57 +125,41 @@ export default function ScrollVideo({
     }
   }, []);
 
-  const handleLoadedMetadata = () => {
-    const vid = videoRef.current;
-    if (vid && vid.duration && !isNaN(vid.duration)) {
-      setDuration(vid.duration);
-      if (onDurationLoaded) onDurationLoaded(vid.duration);
-    }
-  };
-
-  const handleError = () => {
-    setHasError(true);
-  };
-
   return (
     <div
       className="absolute inset-0 w-full h-full overflow-hidden will-change-transform will-change-opacity"
       style={{
         opacity,
         transform: `scale(${scale})`,
-        transition: "opacity 0.4s ease-out, transform 0.3s ease-out",
+        transition: "opacity 0.4s ease-out, transform 0.35s ease-out",
         pointerEvents: opacity > 0.5 ? "auto" : "none",
         zIndex: isActive ? 10 : isUpcoming ? 9 : 1,
       }}
     >
-      {/* Fallback Poster Background in case video buffers or errors */}
-      {posterSrc && (
-        <div
-          className="absolute inset-0 w-full h-full bg-cover bg-center transition-opacity duration-700 pointer-events-none"
-          style={{
-            backgroundImage: `url(${posterSrc})`,
-            opacity: hasError || !duration ? 1 : 0,
-            zIndex: 1,
-          }}
-        />
-      )}
-
-      {/* HTML5 Video Layer */}
+      {/* Direct HTML5 Video with source attached directly on tag */}
       <video
         ref={videoRef}
+        src={videoSrc}
         playsInline
         muted
         loop={false}
         preload={isActive || isUpcoming ? "auto" : "metadata"}
         poster={posterSrc}
-        onLoadedMetadata={handleLoadedMetadata}
-        onError={handleError}
         className="absolute inset-0 w-full h-full object-cover object-center filter brightness-[0.92] contrast-[1.06]"
-      >
-        <source src={videoSrc} type="video/mp4" />
-        {fallbackSrc && <source src={fallbackSrc} type="video/mp4" />}
-      </video>
+      />
+
+      {/* Fallback Poster Background only if error occurs or video not ready */}
+      {posterSrc && (
+        <div
+          className={`absolute inset-0 w-full h-full bg-cover bg-center transition-opacity duration-500 pointer-events-none ${
+            hasError || !isVideoReady ? "opacity-100" : "opacity-0"
+          }`}
+          style={{
+            backgroundImage: `url(${posterSrc})`,
+            zIndex: 2,
+          }}
+        />
+      )}
     </div>
   );
 }
-
