@@ -2,7 +2,7 @@
 
 import React from "react";
 import Navbar from "@/components/layout/Navbar";
-import ScrollExperience from "@/components/cinematic/ScrollExperience";
+import CinematicJourneyScroller from "@/components/cinematic/CinematicJourneyScroller";
 import BrandStorySection from "@/components/story/BrandStorySection";
 import Footer from "@/components/layout/Footer";
 
@@ -12,8 +12,8 @@ export default function Home() {
       {/* Luxury Brand Navigation */}
       <Navbar />
 
-      {/* ── ADVANCED SCROLL-DRIVEN CINEMATIC VIDEO EXPERIENCE (8 STAGES) ── */}
-      <ScrollExperience />
+      {/* ── 8-STAGE SCROLL-DRIVEN CINEMATIC VIDEO EXPERIENCE ── */}
+      <CinematicJourneyScroller />
 
       {/* ── THE FULL BRAND PAGE (BELOW THE FILM) ── */}
       <BrandStorySection />
