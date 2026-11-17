@@ -7,14 +7,13 @@ import Link from "next/link";
 import {
   Volume2,
   VolumeX,
-  ChevronDown,
-  ChevronUp,
   ArrowRight,
   ShoppingBag,
   RotateCcw,
   ArrowDown,
 } from "lucide-react";
 import { useCart } from "@/components/cart/CartContext";
+import { useStageFrames } from "./useStageFrames";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -25,13 +24,13 @@ interface MicroSpec {
 
 interface SceneItem {
   id: string;
+  stageNum: number;
   stepNum: string;
   badge: string;
   title: string;
   titleHighlight: string;
   subtitle: string;
   description: string;
-  videoSrc: string;
   posterSrc: string;
   specs: MicroSpec[];
   alignment: "left" | "right" | "center";
@@ -41,6 +40,7 @@ interface SceneItem {
 const SCENES: SceneItem[] = [
   {
     id: "stage-01",
+    stageNum: 1,
     stepNum: "01",
     badge: "Open-Fire Sear",
     title: "BINCHOTAN CHARCOAL",
@@ -48,7 +48,6 @@ const SCENES: SceneItem[] = [
     subtitle: "650°C Kishu White Oak • Sizzling A5 Japanese Wagyu",
     description:
       "Hand-ground A5 BMS 11 Wagyu patty kisses red-hot cast iron over glowing Kishu binchotan coals, rendering dense intramuscular marbling into pure savory nectar.",
-    videoSrc: "/videos/step-1.mp4",
     posterSrc: "/thumbnails/step_1.jpg",
     specs: [
       { label: "Binchotan Heat", val: "650°C White Oak" },
@@ -60,6 +59,7 @@ const SCENES: SceneItem[] = [
   },
   {
     id: "stage-02",
+    stageNum: 2,
     stepNum: "02",
     badge: "Caramelization",
     title: "THE ROARING",
@@ -67,7 +67,6 @@ const SCENES: SceneItem[] = [
     subtitle: "Rendered Marbling • Deep Mahogany Crust Forming",
     description:
       "Intense open flame ignites rendering wagyu fat, creating the quintessential Maillard reaction and locking juiciness within a glass-crisp mahogany bark.",
-    videoSrc: "/videos/step-2.mp4",
     posterSrc: "/thumbnails/step_2.jpg",
     specs: [
       { label: "Maillard Temp", val: "180°C Caramel" },
@@ -79,6 +78,7 @@ const SCENES: SceneItem[] = [
   },
   {
     id: "stage-03",
+    stageNum: 3,
     stepNum: "03",
     badge: "Haute Drizzle",
     title: "PÉRIGORD BLACK",
@@ -86,7 +86,6 @@ const SCENES: SceneItem[] = [
     subtitle: "Black Winter Truffle • Roasted Bone Marrow Reduction",
     description:
       "A silver culinary spoon releases an 18-hour reduction of black winter diamonds, roasted marrow jus, and 12-year Modena balsamic in a velvety spiral drizzle.",
-    videoSrc: "/videos/step-3.mp4",
     posterSrc: "/thumbnails/step_3.jpg",
     specs: [
       { label: "Truffle Origin", val: "Périgord, France" },
@@ -98,6 +97,7 @@ const SCENES: SceneItem[] = [
   },
   {
     id: "stage-04",
+    stageNum: 4,
     stepNum: "04",
     badge: "Alpine Dairy Craft",
     title: "MOLTEN CAVE-AGED",
@@ -105,7 +105,6 @@ const SCENES: SceneItem[] = [
     subtitle: "24-Month Cave Reserve • Torch-Blistered Velvety Fondue",
     description:
       "Thick cuts of raw-milk Swiss Gruyère cascade luxuriously over the seared patty, blistering into amber bubbles under open flame to release toasted-nut umami.",
-    videoSrc: "/videos/step-4.mp4",
     posterSrc: "/thumbnails/step_4.jpg",
     specs: [
       { label: "Aged Period", val: "24-Month Cave" },
@@ -117,6 +116,7 @@ const SCENES: SceneItem[] = [
   },
   {
     id: "stage-05",
+    stageNum: 5,
     stepNum: "05",
     badge: "Zero-Gravity View",
     title: "EXPLODED ZERO-GRAVITY",
@@ -124,7 +124,6 @@ const SCENES: SceneItem[] = [
     subtitle: "All 7 Artisanal Layers Suspended in Mid-Air Equilibrium",
     description:
       "Every single ingredient suspends in mid-air with millimeter precision: toasted cushion, wagyu patty, molten Gruyère, smoked tomato, frisée, truffle jus, and brioche crown.",
-    videoSrc: "/videos/step-5.mp4",
     posterSrc: "/thumbnails/step_5.jpg",
     specs: [
       { label: "Layer Count", val: "7 Separated Tiers" },
@@ -136,6 +135,7 @@ const SCENES: SceneItem[] = [
   },
   {
     id: "stage-06",
+    stageNum: 6,
     stepNum: "06",
     badge: "The Royal Crown",
     title: "THE WAGYU ICON &",
@@ -143,7 +143,6 @@ const SCENES: SceneItem[] = [
     subtitle: "Gold-Leaf Glazed Brioche • Chiaroscuro Studio Radiance",
     description:
       "The golden Hokkaido milk brioche crown descends gracefully, double-toasted with clarified wagyu tallow and kissed by edible 24K gold leaf.",
-    videoSrc: "/videos/step-6.mp4",
     posterSrc: "/thumbnails/step_6.jpg",
     specs: [
       { label: "Brioche Rise", val: "36-Hour Sourdough" },
@@ -155,6 +154,7 @@ const SCENES: SceneItem[] = [
   },
   {
     id: "stage-07",
+    stageNum: 7,
     stepNum: "07",
     badge: "Harmonic Lock",
     title: "THE REASSEMBLY",
@@ -162,7 +162,6 @@ const SCENES: SceneItem[] = [
     subtitle: "All 7 Culinary Elements Harmonize into One Unified Masterpiece",
     description:
       "Fluid magnetic culinary physics: all floating layers compress and lock together with a succulent, juicy bounce, sending a micro-puff of aromatic steam outward.",
-    videoSrc: "/videos/step-7.mp4",
     posterSrc: "/thumbnails/step_7.jpg",
     specs: [
       { label: "Structure", val: "Seamless Fusion" },
@@ -174,6 +173,7 @@ const SCENES: SceneItem[] = [
   },
   {
     id: "stage-08",
+    stageNum: 8,
     stepNum: "08",
     badge: "Delivery Prestige",
     title: "OCTAGONAL PACKAGING",
@@ -181,7 +181,6 @@ const SCENES: SceneItem[] = [
     subtitle: "Matte Black Vault • Thermal Gold Velvet • Ready to Serve",
     description:
       "The assembled burger docks into our bespoke matte black octagonal presentation vault. The magnetic lid softly closes with gold-foil seals, locking core warmth at 65°C.",
-    videoSrc: "/videos/step-8.mp4",
     posterSrc: "/thumbnails/step_8.jpg",
     specs: [
       { label: "Case Vault", val: "Matte Octagonal" },
@@ -193,7 +192,7 @@ const SCENES: SceneItem[] = [
   },
 ];
 
-// Individual Pinned Stage Section
+// Single Pinned Stage Section with Canvas Frame Scrubber
 function StageSection({
   scene,
   index,
@@ -204,55 +203,92 @@ function StageSection({
   onInView: (idx: number) => void;
 }) {
   const sectionRef = useRef<HTMLElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
   const [progress, setProgress] = useState(0);
 
+  const { isReady, draw } = useStageFrames(scene.stageNum, 60);
+
+  // Resize canvas to match display size exactly
+  const resizeCanvas = useCallback(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const w = window.innerWidth;
+    const h = window.innerHeight;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    if (canvas.width !== Math.floor(w * dpr) || canvas.height !== Math.floor(h * dpr)) {
+      canvas.width = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
+    }
+  }, []);
+
+  useEffect(() => {
+    resizeCanvas();
+    window.addEventListener("resize", resizeCanvas);
+    return () => window.removeEventListener("resize", resizeCanvas);
+  }, [resizeCanvas]);
+
+  // Initial draw when ready
+  useEffect(() => {
+    if (isReady && canvasRef.current) {
+      draw(canvasRef.current, progress);
+    }
+  }, [isReady, progress, draw]);
+
+  // ScrollTrigger Setup
   useEffect(() => {
     const section = sectionRef.current;
-    const video = videoRef.current;
-    if (!section || !video) return;
+    const canvas = canvasRef.current;
+    if (!section || !canvas) return;
 
-    // Ensure video is paused on load (does NOT autoplay)
-    video.pause();
-    video.currentTime = 0;
+    let currentProgress = 0;
+    let targetProgress = 0;
+    let animId = 0;
 
-    let rAFId = 0;
+    // Smooth render loop (lerp interpolation)
+    const renderLoop = () => {
+      currentProgress += (targetProgress - currentProgress) * 0.22;
+      draw(canvas, currentProgress);
+      animId = requestAnimationFrame(renderLoop);
+    };
+    animId = requestAnimationFrame(renderLoop);
 
     const trigger = ScrollTrigger.create({
       trigger: section,
       start: "top top",
       end: "bottom bottom",
-      scrub: 0.15, // Immediate buttery scrubbing with normal scroll
+      scrub: 0.2, // Buttery smooth response to scroll wheel & touch
       onEnter: () => onInView(index),
       onEnterBack: () => onInView(index),
       onUpdate: (self) => {
-        const p = self.progress;
-        setProgress(p);
-
-        // Frame-accurate video seek on scroll
-        cancelAnimationFrame(rAFId);
-        rAFId = requestAnimationFrame(() => {
-          const dur = video.duration || 10;
-          const targetTime = Math.min(Math.max(p * dur, 0), Math.max(dur - 0.04, 0));
-          if (Math.abs(video.currentTime - targetTime) > 0.02) {
-            video.currentTime = targetTime;
-          }
-        });
+        targetProgress = self.progress;
+        setProgress(self.progress);
       },
     });
 
     return () => {
-      cancelAnimationFrame(rAFId);
+      cancelAnimationFrame(animId);
       trigger.kill();
     };
-  }, [index, onInView]);
+  }, [index, onInView, draw]);
 
   const isCenter = scene.alignment === "center";
   const isRight = scene.alignment === "right";
 
-  // Text animation calculations
-  const textOpacity = progress < 0.12 ? progress / 0.12 : progress > 0.88 ? (1 - progress) / 0.12 : 1;
-  const textTranslateY = progress < 0.12 ? (1 - textOpacity) * 20 : progress > 0.88 ? -((1 - textOpacity) * 15) : 0;
+  // Typography transitions: enters at start, stays stable, fades out gracefully near stage exit
+  const textOpacity =
+    progress < 0.1
+      ? Math.max(0, progress / 0.1)
+      : progress > 0.88
+      ? Math.max(0, (1 - progress) / 0.12)
+      : 1;
+
+  const textTranslateY =
+    progress < 0.1
+      ? (1 - textOpacity) * 24
+      : progress > 0.88
+      ? -((1 - textOpacity) * 20)
+      : 0;
 
   return (
     <section
@@ -260,38 +296,32 @@ function StageSection({
       id={scene.id}
       className="relative w-full bg-[#080706]"
       style={{
-        // 220vh track height: gives ample time to scrub through the 10s video smoothly
-        height: "220vh",
+        // 300vh track height: gives ample, comfortable scroll space for smooth 60-frame playback
+        height: "300vh",
       }}
     >
       {/* ── PINNED FULL-SCREEN VIEWPORT ── */}
       <div className="sticky top-0 h-screen w-full overflow-hidden flex items-center justify-center bg-[#080706] select-none">
-        {/* Full-Screen Scrubbable Video */}
-        <video
-          ref={videoRef}
-          src={scene.videoSrc}
-          playsInline
-          muted
-          loop={false}
-          preload="auto"
-          poster={scene.posterSrc}
-          className="absolute inset-0 w-full h-full object-cover object-center filter brightness-[0.92] contrast-[1.05]"
+        {/* Full-Screen Canvas Scrubbed Frame Animation */}
+        <canvas
+          ref={canvasRef}
+          className="absolute inset-0 w-full h-full object-cover filter brightness-[0.92] contrast-[1.05]"
         />
 
-        {/* Cinematic Vignettes & Contrast Overlays */}
+        {/* Cinematic Radial Vignette & Contrast Overlays */}
         <div className="absolute inset-0 pointer-events-none vignette-radial" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#080706] via-transparent to-[#080706]/75 pointer-events-none" />
         <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/60 pointer-events-none" />
 
-        {/* Ambient Color Aura */}
+        {/* Ambient Color Aura Glow */}
         <div
-          className="absolute -top-32 -left-32 w-96 h-96 rounded-full blur-[120px] pointer-events-none opacity-15"
+          className="absolute -top-32 -left-32 w-96 h-96 rounded-full blur-[130px] pointer-events-none opacity-20"
           style={{ backgroundColor: scene.accentColor }}
         />
 
         {/* Synchronized Typography Overlay */}
         <div
-          className={`absolute z-30 pointer-events-none transition-all duration-200 ease-out will-change-transform ${
+          className={`absolute z-30 pointer-events-none transition-all duration-150 ease-out will-change-transform ${
             isCenter
               ? "top-20 sm:top-24 inset-x-0 mx-auto px-6 max-w-4xl text-center flex flex-col items-center"
               : isRight
@@ -312,7 +342,7 @@ function StageSection({
                 : ""
             }`}
           >
-            {/* Stage Badge with Live Indicator */}
+            {/* Stage Badge with Pulsing Gold Dot */}
             <div
               className={`inline-flex items-center gap-2.5 px-3.5 py-1.5 rounded-full bg-black/60 backdrop-blur-xl border border-[#e5a93c]/35 shadow-[0_0_20px_rgba(229,169,60,0.15)] mb-3.5 ${
                 isCenter ? "mx-auto" : ""
@@ -343,7 +373,7 @@ function StageSection({
               {scene.subtitle}
             </p>
 
-            {/* Description */}
+            {/* Culinary Description */}
             <p className="mt-3.5 text-xs sm:text-sm text-white/75 font-light leading-relaxed max-w-xl">
               {scene.description}
             </p>
@@ -378,7 +408,7 @@ function StageSection({
   );
 }
 
-// Master Scroller coordinating all 8 sections
+// Master Scroller coordinating all 8 sequential pinned sections
 export default function CinematicJourneyScroller() {
   const [activeStage, setActiveStage] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
@@ -386,7 +416,7 @@ export default function CinematicJourneyScroller() {
   const gainNodeRef = useRef<GainNode | null>(null);
   const { setIsCartOpen } = useCart();
 
-  // Synthetic ambient kitchen ember/sizzle sound
+  // Ambient kitchen sizzle/ember sound generator
   const initAmbientAudio = useCallback(() => {
     if (audioContextRef.current) return;
     try {
@@ -479,7 +509,7 @@ export default function CinematicJourneyScroller() {
         />
       </div>
 
-      {/* ── ALL 8 PINNED VIDEO SECTIONS IN SEQUENTIAL SCROLL ── */}
+      {/* ── ALL 8 PINNED SECTIONS IN SEQUENTIAL SCROLL ── */}
       {SCENES.map((scene, idx) => (
         <StageSection
           key={scene.id}

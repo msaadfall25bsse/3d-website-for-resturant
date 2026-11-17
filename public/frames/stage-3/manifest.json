@@ -1,0 +1,6 @@
+{
+  "stage": 3,
+  "count": 60,
+  "pattern": "/frames/stage-3/frame_%03d.webp",
+  "totalBytes": 1678166
+}
